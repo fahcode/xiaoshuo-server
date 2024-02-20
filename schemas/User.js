@@ -1,6 +1,6 @@
 var mongoose = require('mongoose')
 //var db = mongoose.createConnection('localhost','movie'); //创建一个数据库连接
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcryptjs');
 
 var SALT_WORK_FACTOP = 10;
 
