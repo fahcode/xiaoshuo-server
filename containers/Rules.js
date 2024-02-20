@@ -10,7 +10,7 @@ const rules = {
 				return ""
 			},
 			url: (ops)=>{
-				return `https://www.qidian.com/search?kw=${ops.name}`;
+				return `https://www.qidian.com/so/${ops.name}.html`;
 			},
 			encodeURI: true,
 			headers: () => {return {}},
@@ -18,18 +18,18 @@ const rules = {
 				//结果列表
 				lists: ".book-img-text ul>li",
 				link: {
-					dom: ".book-mid-info h4 a",
+					dom: ".book-mid-info h3 a",
 					action: 'attr("href")',
 					prefix: ""
 				},
 				//name
 				name: {
-					dom: ".book-mid-info h4 a",
+					dom: ".book-mid-info h3 a",
 					action: "text()"
 				},
 				//id
 				id: {
-					dom: ".book-mid-info h4 a",
+					dom: ".book-mid-info h3 a",
 					//动作，是获取属性
 					action: 'attr("data-bid")'
 				},
@@ -94,7 +94,7 @@ const rules = {
 		},
 		info: {
 			url: (ops)=>{
-				return `https://book.qidian.com/info/${ops.bookID}`;
+				return `https://www.qidian.com/book/${ops.bookID}/`;
 			},
 			domRules: {
 				id: {
