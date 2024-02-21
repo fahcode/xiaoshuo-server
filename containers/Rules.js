@@ -3,6 +3,7 @@
 //解析配置
 const rules = {
 	qidian: {
+		useBrowser: true,
 		name: "起点",
 		search: {
 			method: "GET",

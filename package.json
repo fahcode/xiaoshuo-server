@@ -16,7 +16,8 @@
     "koa-session2": "^2.2.5",
     "koa-websocket": "^5.0.1",
     "md5": "^2.2.1",
-    "mongoose": "^5.0.1"
+    "mongoose": "^5.0.1",
+    "playwright": "^1.41.2"
   },
   "devDependencies": {
     "cheerio": "^1.0.0-rc.2",

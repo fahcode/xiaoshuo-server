@@ -5,12 +5,17 @@ charset(superagent);
 const request = require('request');
 
 const iconv = require("iconv-lite")
-var urlencode = require('urlencode');
+const urlencode = require('urlencode');
+const { chromium } = require('playwright');
 
 /////////规则配置
 const Rules = require('./Rules');
 /////////解析结构文件
 const Analysis = require('./Analysis');
+
+// 初始化无头浏览器
+let browserContext = null;
+initBrowser();
 
 function left_zero_4(str) {
     if (str != null && str != '' && str != 'undefined') {
@@ -56,6 +61,12 @@ function chinese2Gb2312(data) {
     return gb2312Hex.toUpperCase();
 }
 
+async function initBrowser() {
+    // 启动浏览器
+    const browser = await chromium.launch();
+    browserContext = await browser.newContext();
+}
+
 
 //搜索书籍
 const searchBook = async (option) => {
@@ -94,38 +105,56 @@ const searchBook = async (option) => {
     };
 
     let p1 = function () {
-        return new Promise(function (resolve, reject) {
-            if (method == "POST") {
-                request.post({ url, form: formData, headers }, function (err, httpResponse, body) {
-                    if (err) {
-                        ////站点错误
-                        console.log(err)
-                        resolve({ status: -1 })
-                    } else {
-                        //console.log('状态码'+ JSON.stringify(httpResponse))
-                        console.log('内容' + body);
-                        //return false;
-                        resolve({
-                            status: httpResponse.statusCode,
-                            text: body
-                        })
-                    }
-                })
-            } else {
-                superagent(method, url).set(headers).charset(charset).set('accept', 'json').send(formData).end(function (err, res) {
-                    if (err) {
-                        ////站点错误
-                        console.log(err)
-                        resolve({ status: -1 })
-                    } else {
-                        console.log('状态码' + JSON.stringify(res))
-                        resolve({
-                            status: res.statusCode,
-                            text: res.text
-                        })
-                    }
+        return new Promise(async function (resolve, reject) {
+            if (Rules.qidian.useBrowser && browserContext) {
+                const page = await browserContext.newPage();
 
+                // 导航到目标网址
+                await page.goto(url);
+
+                // 获取页面的HTML内容
+                const text = await page.content();
+                consle.log('content:', text);
+                // 关闭页面
+                page.close();
+
+                resolve({
+                    status: 200,
+                    text: text
                 });
+            } else {
+                if (method == "POST") {
+                    request.post({ url, form: formData, headers }, function (err, httpResponse, body) {
+                        if (err) {
+                            ////站点错误
+                            console.log(err)
+                            resolve({ status: -1 })
+                        } else {
+                            //console.log('状态码'+ JSON.stringify(httpResponse))
+                            console.log('内容' + body);
+                            //return false;
+                            resolve({
+                                status: httpResponse.statusCode,
+                                text: body
+                            })
+                        }
+                    })
+                } else {
+                    superagent(method, url).set(headers).charset(charset).set('accept', 'json').send(formData).end(function (err, res) {
+                        if (err) {
+                            ////站点错误
+                            console.log(err)
+                            resolve({ status: -1 })
+                        } else {
+                            console.log('状态码' + JSON.stringify(res))
+                            resolve({
+                                status: res.statusCode,
+                                text: res.text
+                            })
+                        }
+
+                    });
+                }
             }
         });
     }
